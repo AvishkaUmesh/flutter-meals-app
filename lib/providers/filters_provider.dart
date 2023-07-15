@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meals/providers/meals_provider.dart';
 
 enum Filter {
   glutenFree,
@@ -35,3 +36,24 @@ final filtersProvider =
     return FiltersProvider();
   },
 );
+
+final filteredMealProvider = Provider((ref) {
+  final selectedFilters = ref.watch(filtersProvider);
+  final availableMeals = ref.watch(mealsProvider);
+
+  return availableMeals.where((meal) {
+    if (selectedFilters[Filter.vegetarian]! && !meal.isVegetarian) {
+      return false;
+    }
+    if (selectedFilters[Filter.vegan]! && !meal.isVegan) {
+      return false;
+    }
+    if (selectedFilters[Filter.glutenFree]! && !meal.isGlutenFree) {
+      return false;
+    }
+    if (selectedFilters[Filter.lactoseFree]! && !meal.isLactoseFree) {
+      return false;
+    }
+    return true;
+  }).toList();
+});
